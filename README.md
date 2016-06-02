@@ -30,8 +30,8 @@ DBプログラミング入門 by ODP.NET
 
 1. [2つの世界](doc/01-two-worlds.md)  
   まずはプログラムからDBにアクセスするというｎはどういうことなのか、概念を理解していきましょう。
-2. [データプロバイダー](doc/02-data-provider.md)  
-  .NET Frameworkから世界をまたいでDBにアクセスするために必要なデータプロバイダーの基本を学びましょう。
+2. [データ プロバイダー](doc/02-data-provider.md)  
+  .NET Frameworkから世界をまたいでDBにアクセスするために必要なデータ プロバイダーの基本を学びましょう。
 3. [DBに接続する](doc/03-connect-to-db.md)  
   プログラムからDBに接続する手順について学びましょう。
 4. [単純な問い合わせ](doc/04-execute-query.md)  
