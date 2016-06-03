@@ -5,11 +5,11 @@
 
 [←第2章 データ プロバイダー](02-data-provider.md)
 
-データ プロバイダーの構成やDBアクセスの手順の大枠がわかったところで、今度は具体的な内容に入っていきましょう。まずはDBに接続する方法からです。
+データ プロバイダーの構成やDBアクセスの手順の大枠がわかったところで、今度は具体的な内容に入っていきましょう。まずはDBに接続する方法からです。なお、本文書ではローカルPCにOracle Databaseがインストールされている前提で以後の説明を進めます。
 
 ## ODP.NET
 
-本文書ではサンプルデータベースにOracle Databaseを用います。Oracl Database向けのデータプロバイダーは、実は.NET FrameworkにもSystem.Data.OracleClient名前空間に含まれています。ただし、現在は非推奨になっていること、7i、8i、9iなど過去のバージョン向けであることから、使わないようにしてください。
+Oracl Database向けのデータプロバイダーは、実は.NET FrameworkにもSystem.Data.OracleClient名前空間として含まれています。ただし、現在は非推奨になっていること、7i、8i、9iなど過去のバージョン向けであることから、使わないようにしてください。
 
 その代わり、Oracle社から提供されている「ODP.NET」を用います。ODP.NETはOracle向けODBCドライバー等の各種データアクセス用コンポーネント群をまとめた「[Oracle Data Access Components（ODAC）](64ビットのOracle Data Access Components（ODAC）のダウンロード http://www.oracle.com/technetwork/jp/database/windows/downloads/index-214820-ja.html)」に含まれる、Oracle専用データプロバイダーです。
 
@@ -63,7 +63,73 @@ ODP.NETのインストールが行われます。インストールした結果�
 
 図3-7 パッケージインストール結果
 
-なお、ODACをインストールした場合は、プロジェクトのプロパティより「アセンブリ」→「拡張」欄に表示される「Oracle.ManagedDataAccess」への参照を追加すること。
+なお、ODACをインストールした場合は、プロジェクトのプロパティより「アセンブリ」→「拡張」欄に表示される「Oracle.ManagedDataAccess」への参照を追加すればよいです。
+
+## DBアクセス準備
+
+ODP.NETのインストールが終わったので、今度は実際に接続するための準備を進めていきます。まず、ODP.NETに含まれるDbProviderFactory型派生クラスのインスタンスを取得するため、アプリケーション構成ファイルの設定を行います（リスト3-1）。
+
+リスト3-1 アプリケーション構成ファイル設定（App.configより）
+
+```csharp
+<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+  <!-- (1) -->
+  <configSections>
+    <section name="oracle.manageddataaccess.client" type="OracleInternal.Common.ODPMSectionHandler, Oracle.ManagedDataAccess, Version=4.121.2.0, Culture=neutral, PublicKeyToken=89b483f429c47342"/>
+  </configSections>
+  <startup>
+    <supportedRuntime version="v4.0" sku=".NETFramework,Version=v4.6.1"/>
+  </startup>
+  <!-- (2) -->
+  <system.data>
+    <DbProviderFactories>
+      <remove invariant="Oracle.ManagedDataAccess.Client"/>
+      <add name="ODP.NET, Managed Driver" invariant="Oracle.ManagedDataAccess.Client" description="Oracle Data Provider for .NET, Managed Driver" type="Oracle.ManagedDataAccess.Client.OracleClientFactory, Oracle.ManagedDataAccess, Version=4.121.2.0, Culture=neutral, PublicKeyToken=89b483f429c47342"/>
+    </DbProviderFactories>
+  </system.data>
+  <!-- (3) -->
+  <runtime>
+    <assemblyBinding xmlns="urn:schemas-microsoft-com:asm.v1">
+      <dependentAssembly>
+        <publisherPolicy apply="no"/>
+        <assemblyIdentity name="Oracle.ManagedDataAccess" publicKeyToken="89b483f429c47342" culture="neutral"/>
+        <bindingRedirect oldVersion="4.121.0.0 - 4.65535.65535.65535" newVersion="4.121.2.0"/>
+      </dependentAssembly>
+    </assemblyBinding>
+  </runtime>
+  <!-- (4) -->
+  <oracle.manageddataaccess.client>
+    <version number="*">
+      <dataSources>
+        <!-- (5) -->
+        <dataSource alias="ORCL"
+          descriptor="(DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=hostname)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=ORCL))) "/>
+      </dataSources>
+    </version>
+  </oracle.manageddataaccess.client>
+  <!-- (6) -->
+  <connectionStrings>
+    <add name="SCOTT"
+      providerName="Oracle.ManagedDataAccess.Client"
+      connectionString="Data Source=ORCL;User Id=scott;Password=tiger;" />
+  </connectionStrings>
+</configuration>
+```
+
+(1)から(4)については先ほどNuGetでODP.NETをインストールした時に自動で追加された部分です。ODACをインストールした場合は、(2)と(3)はマシンで共通の構成ファイル（machine.config）に追加されるので、自分でApp.configに書く必要はありません。
+
+ポイントは(5)と(6)です。
+
+### (5) データソース設定
+
+(4)に含まれるoracle.manageddataaccess > version > dataSources > dataSource要素が接続先のOracleサーバー情報を記載する箇所です。alias属性には(6)で使用するデータソース名を指定し、descripter要素に実際の接続情報を指定します。記載内容はtnsnames.oraファイルに書くものと全く同じです。なお、HOST項目は既定では"localhost"が設定されていますが、ローカルにOracle Databaseがインストールされているときは自らのマシン名を指定するようにしてください。．
+
+### (6) 接続文字列設定
+
+次にプログラム無いから(5)で指定したデータソースに接続するための「データベース接続文字列（以後単に接続文字列）」情報を追加します。name属性にはプログラム内からこの接続文字列を取得する際に使用する名前、providerName属性には(2)のsystem.data > DbProviderFactories > add要素のinvariant属性で指定した名前を設定します。そして最も大事なconnectionString属性には、接続に使用するデータソース名、ユーザー、パスワードを最低限指定します。接続文字列の記法に就いてより詳しい内容は、次のURLを参照してください。
+
+[Oracle Data Provider for .NET / ODP.NET Connection Strings - ConnectionStrings.com](http://www.connectionstrings.com/oracle-data-provider-for-net-odp-net/)
 
 
 
