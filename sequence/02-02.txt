@@ -1,0 +1,56 @@
+Application->DbProviderFactories: ①DbProviderFactoryインスタンス取得
+activate Application
+activate DbProviderFactories
+
+DbProviderFactories->+DbProviderFactory: 生成
+
+Application->DbProviderFactory: ②DbConnection作成
+DbProviderFactory->+DbConnection: 生成
+
+Application->DbConnection: ③開く
+
+Application->DbConnection: ④トランザクション開始
+DbConnection->+DbTransaction: 生成
+
+Application->DbConnection: ⑤DbCommand作成
+DbConnection->+DbCommand: 生成
+
+Application->DbCommand: トランザクション設定
+
+note left of Application
+    ⑥SQL実行
+    ⑦結果取得
+end note
+
+alt 問い合わせ
+    Application->DbCommand: SELECT文実行
+    DbCommand->+DbDataReader: 生成
+    loop ⑦カーソル処理
+        Application->DbDataReader: カーソル操作、データ取得
+        DbDataReader-->Application: データ
+    end
+    Application->DbDataReader: 破棄
+    destroy DbDataReader
+else 非問い合わせ
+    Application->DbCommand: SELECT文以外実行
+    DbCommand-->Application: 処理件数
+else スカラー値
+    Application->DbCommand: SELECT文でCOUNT(*)等の実行
+    DbCommand-->Application: 件数等のスカラー値
+else エラー
+    Application->DbCommand: SQL実行
+    DbCommand-->Application: DbExceptionで通知
+end
+
+Application->DbCommand: 破棄
+destroy DbCommand
+
+Application->DbTransaction: ⑧コミット/ロールバック
+destroy DbTransaction
+
+Application->DbConnection: ⑨閉じる
+destroy DbConnection
+
+Application->DbProviderFactory: 破棄
+destroy DbProviderFactory
+
