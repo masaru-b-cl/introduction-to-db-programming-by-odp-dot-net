@@ -132,5 +132,21 @@ ODP.NETのインストールが終わったので、今度は実際に接続す�
 [Oracle Data Provider for .NET / ODP.NET Connection Strings - ConnectionStrings.com](http://www.connectionstrings.com/oracle-data-provider-for-net-odp-net/)
 
 
+## 必要ライブラリ参照
+
+次にDBアクセスに必要なライブラリ参照を追加します。次のライブラリへの参照をプロジェクトに追加します（図3-8）。
+
+| ライブラリ名         | 説明                                                     |
+|----------------------|----------------------------------------------------------|
+| System.Data          | データ プロバイダー本体                                  |
+| System.Configuration | 接続文字列情報をアプリケーション構成ファイルから読み込む |
+
+表3-1 DBアクセスに必要なライブラリ
+
+![ライブラリ参照状況](../image/03-08.jpg)
+
+図3-8 ライブラリ参照状況
+
+
 
 [→第4章 単純な問い合わせ](04-execute-query.md)
