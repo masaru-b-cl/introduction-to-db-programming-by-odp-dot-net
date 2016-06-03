@@ -71,7 +71,7 @@ ODP.NETのインストールが終わったので、今度は実際に接続す�
 
 リスト3-1 アプリケーション構成ファイル設定（App.configより）
 
-```csharp
+```xml
 <?xml version="1.0" encoding="utf-8"?>
 <configuration>
   <!-- (1) -->
@@ -127,7 +127,9 @@ ODP.NETのインストールが終わったので、今度は実際に接続す�
 
 ### (6) 接続文字列設定
 
-次にプログラム無いから(5)で指定したデータソースに接続するための「データベース接続文字列（以後単に接続文字列）」情報を追加します。name属性にはプログラム内からこの接続文字列を取得する際に使用する名前、providerName属性には(2)のsystem.data > DbProviderFactories > add要素のinvariant属性で指定した名前を設定します。そして最も大事なconnectionString属性には、接続に使用するデータソース名、ユーザー、パスワードを最低限指定します。接続文字列の記法に就いてより詳しい内容は、次のURLを参照してください。
+次にプログラム無いから(5)で指定したデータソースに接続するための「データベース接続文字列（以下、DB接続文字列）」情報を追加します。name属性にはプログラム内からこの接続文字列を取得する際に使用する名前、providerName属性には(2)のsystem.data > DbProviderFactories > add要素のinvariant属性で指定した名前を設定します。そして最も大事なconnectionString属性には、接続に使用するデータソース名、ユーザー、パスワードをそれぞれ指定します。今回はOracleのサンプルスキーマであるSCOTTに接続します。
+
+なお、接続文字列にはもっと詳細な設定も可能です。てより詳しい内容は、次のURLを参照してください。
 
 [Oracle Data Provider for .NET / ODP.NET Connection Strings - ConnectionStrings.com](http://www.connectionstrings.com/oracle-data-provider-for-net-odp-net/)
 
@@ -147,6 +149,85 @@ ODP.NETのインストールが終わったので、今度は実際に接続す�
 
 図3-8 ライブラリ参照状況
 
+これでようやくOracle Databaseにアクセスするコードを書く準備ができました。
+
+## DB接続処理
+
+それでは実際にDB接続を開いて閉じるだけのプログラムを書いてみましょう（リスト3-2）。
+
+リスト3-2 DB接続処理（Program.cs）
+
+```csharp
+// (1) 名前空間のインポート
+using System.Configuration;
+using System.Data.Common;
+
+namespace SimpleQueryApplication
+{
+  class Program
+  {
+    static void Main(string[] args)
+    {
+      // (2) DB接続文字列情報の取得
+      var connectionStringSettings = ConfigurationManager.ConnectionStrings["SCOTT"];
+
+      // (3) DbProficerFactoryインスタンスの生成、取得
+      var dbProviderFactory = DbProviderFactories.GetFactory(connectionStringSettings.ProviderName);
+
+      // (4) DB接続オブジェクトを作成
+      using (var dbConnection = dbProviderFactory.CreateConnection())
+      {
+        // (5) DB接続文字列の設定
+        dbConnection.ConnectionString = connectionStringSettings.ConnectionString;
+
+        // (6) DB接続を開く
+        dbConnection.Open();
+
+        // TODO : SQL実行処理をここに書く
+
+        // (7) DB接続を閉じる
+        dbConnection.Close();
+      }
+    }
+  }
+}
+```
+
+### (1) 名前空間のインポート
+
+まず最初に、参照したライブラリの名前空間をusing句でインポートしましょう。以下の2つの名前空間がひつようです。
+
+- System.Configuration
+- System.Data.Common
+
+### (2) DB接続文字列情報の取得
+
+次にApp.configで設定したDB接続文字列情報を、ConfigurationManagerクラスのConnectionString静的プロパティを使って取得します。このプロパティはConnectionStringSettingsCollection型であり、インデクサ引数としてリスト3-1の(6)で指定したname属性の値を指定することで、対応するDB接続文字列情報が取得できます。
+
+### (3) DbProviderFactoryインスタンスの生成、取得
+
+続いてDbProviderFactoriesクラスのGetFactory静的メソッドを使い、ODP.NETのDbProviderFactory派生クラスのインスタンスを生成、取得します。引数にはデータ プロバイダー名を指定します。今回はDB接続文字列情報のProviderNameプロパティを使用しています。これは、プログラム弧度内に直接データ プロバイダー名を書かずに済ませるためです。
+
+### (4) DB接続オブジェクト作成
+
+(3)で取得したDbProviderFactoryインスタンスのCreateConnectionメソッドを呼び出し、DB接続オブジェクトを作成します。この時、using文を使っているのは、DbConnectionクラスがIDisposableインターフェイスを実装しており、必ずDisposeメソッドを最後に呼び出す必要が有るためです。
+
+DbConnectionクラスに限らず、DBアクセスに関するクラスの大部分がIDisposableインターフェイスを実装しています。これは、アプリケーションの「外」にあるDBとやり取りする都合上、仕方のない事です。
+
+### (5) DB接続文字列の設定
+
+(4)で作成したDB接続オブジェクトはまだまっさらの状態で、どこに接続に行けば良いかも知らない状態です。そこで、(1)で取得したDB接続文字列情報から、DB接続文字列を設定してやります。
+
+### (6) DB接続を開く
+
+これでDBにセス属する準備ができましたので、Openメソッドを呼び出してDB接続を開きます。SQL実行やトランザクション開始などは、DB接続を開く前には実行できません。DB接続オブジェクトを作成した後は、必ず開いてから次の処理を行ってください。
+
+### (7) DB接続を閉じる
+
+SQLの実行などのDBアクセス処理を終えたら、最後にCloseメソッドを呼び出してDB接続を閉じましょう。なお、CloseメソッドとDisposeメソッドは実質的に同じ処理を行っていますので、using文を使っていればCloseメソッドの呼び出しを省略することも出来ます。ただ、私としては、処理の対称性と言った意味から、Closeメソッドは省略しないことにしています。
+
+
+ODP.NETをインストールし、DBに接続を開くことが出来るようになったので、次の章から具体的なSQL実行方法を順に学んでいきましょう。
 
 
 [→第4章 単純な問い合わせ](04-execute-query.md)
