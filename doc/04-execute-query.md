@@ -63,6 +63,9 @@ using (var dbConnection = dbProviderFactory.CreateConnection())
 }
 ```
 
+### ①DbCommandオブジェクト作成
+
+まず最初にSQL実行用のDbCommandオブジェクトをDbConnectionクラスのCreateCommandメソッドを使って作成します。DbCommandクラスは他のクラス同様IDisposableインターフェイスを実装していますので、using文を使って確実にDisposeメソッドが呼ばれるようにしてください。
 
 
 [→第5章 スカラー値の取得](05-get-scalar-value.md)  
