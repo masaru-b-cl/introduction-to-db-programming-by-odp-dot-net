@@ -67,5 +67,15 @@ using (var dbConnection = dbProviderFactory.CreateConnection())
 
 まず最初にSQL実行用のDbCommandオブジェクトをDbConnectionクラスのCreateCommandメソッドを使って作成します。DbCommandクラスは他のクラス同様IDisposableインターフェイスを実装していますので、using文を使って確実にDisposeメソッドが呼ばれるようにしてください。
 
+### ②実行SQL文設定
+
+次に実行したいSELECT文を書いたSQLをDbCommandオブジェクトに設定します。この時、逐語的リテラル文字列（@"..."）を使って自由に改行、空白を含んだ形でSQLを書くと良いでしょう。また、例えば次のような基準で、メンテナンスしやすい形でSQLを書いてやるのも良いでしょう。
+
+- SQLキーワードは小文字
+- 列名は大文字
+- 1行に1キーワード
+- 1行に1項目
+- ","（カンマ）は前置
+    - 最後に項目を追加する際、ひとつ前の行の末尾に","を付け足す必要が無いため
 
 [→第5章 スカラー値の取得](05-get-scalar-value.md)  
