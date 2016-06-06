@@ -102,4 +102,71 @@ using (var dbCommand = dbConnection.CreateCommand())
 ※参考：[ODP.NETファーストステップ（1）：ODP.NETでOracle固有の機能を活用する (4/4) - ＠IT](http://www.atmarkit.co.jp/ait/articles/0411/27/news013_4.html)
 
 
-[→第9章 例外処理](09-handle-exception.md)
+## ②無名ブロック使用
+
+ストアド・プロシージャ呼び出しにはもう一つ方法があります。それは、PL/SQLの無名ブロックを使うことです（リスト8-3）。
+
+リスト8-3 無名ブロック使用（Program.csのMainメソッドより）
+
+```csharp
+// ②無名ブロック使用
+using (var dbCommand = dbConnection.CreateCommand())
+{
+  // (1) PL/SQL無名ブロック定義
+  dbCommand.CommandText = @"
+    BEGIN
+      :CNT := GET_EMP_CNT(:ENAME);
+    END;
+  ";
+
+  // (2) 戻り値用出力パラメーター設定
+  var returnParameter = dbCommand.CreateParameter();
+  returnParameter.Direction = ParameterDirection.Output;
+  returnParameter.DbType = DbType.Int32;
+  dbCommand.Parameters.Add(returnParameter);
+
+  // (3) 引数用入力パラメーター設定
+  var enameParameter = dbCommand.CreateParameter();
+  enameParameter.DbType = DbType.String;
+  enameParameter.Value = ename;
+  dbCommand.Parameters.Add(enameParameter);
+
+  // (4) ストアド・プロシージャ実行
+  dbCommand.ExecuteNonQuery();
+
+  // (5) 戻り値取得
+  var employeeCount = Convert.ToInt32(returnParameter.Value);
+
+  Console.WriteLine($"該当社員数 : {employeeCount}");
+}
+```
+
+### (1) PL/SQL無名ブロック定義
+
+DbCommandオブジェクトのCommandTextプロパティに、ストアド・プロシージャ呼び出しを記載したPL/SQL無名ブロックを設定します。このとき、戻り値と引数はパラメーターとして定義することに注意してください。
+
+また、CommandTypeプロパティは既定のまま（CommandType.Text値）にします。
+
+### (2) 戻り値用出力パラメーター設定
+
+次に、戻り値を受け取るためのパラメーターを、出力パラメーターとして追加します。無名ブロック内での定義順の通り、一番最初に追加してやりましょう。
+
+### (3) 引数用パラメーター設定
+
+直接呼び出しと同じように、ストアド・プロシージャの引数に対応するパラメーターも追加します。
+
+### (4) ストアド・プロシージャ実行
+
+準備が整ったところで、DbCommandオブジェクトのExecuteNonQueryメソッドを呼び出して、ストアド・プロシージャを実行します。直接呼び出しと同様に、ExecuteNonQueryメソッドの戻り値は必ず-1になるので、取得する必要はありません。
+
+### (5) 戻り値取得
+
+最後に、戻り値があれば(2)で追加した戻り値用出力パラメーターオブジェクトのValueプロパティから、戻り値を取得します。
+
+
+直接呼び出し、無名ブロックどちらの方法でもストアド・プロシージャを実行することが出来ますが、ストアド・プロシージャ名を外部で管理しているような場合は、直接呼び出しを行ったほうが良いでしょう。
+
+
+これで、ストアド・プロシージャ実行も出来るようになりました。これで一通りのDBアクセスが出来るようになったところで、次の章ではトランザクションの扱いについて学びましょう。
+
+[→第9章 トランザクション管理](09-manage-transaction.md)

@@ -44,8 +44,12 @@ DBプログラミング入門 by ODP.NET
   パラメーターを用いたSQL文を実行する手順について学びましょう。
 8. [ストアド・プロシージャ](doc/08-call-stored-procedure.md)  
   ストアド・プロシージャを呼び出す手順について学びましょう。
-9. [例外処理](doc/09-handle-exception.md)
+9. [トランザクション管理](doc/09-manage-transaction.md)  
+  DBアクセス時のトランザクションを管理する方法について学びましょう。
+10. [例外処理](doc/10-handle-exception.md)  
   DBアクセスに伴う例外処理について学びましょう。
+11. [O/Rマッパーの利用](doc/use-object-relational-mapper.md)  
+  SQL実行処理の煩雑さを緩和してくれる、O/Rマッパーの使い方を学びましょう。
 
 ## サンプルについて
 
