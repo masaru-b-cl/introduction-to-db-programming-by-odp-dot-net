@@ -34,10 +34,10 @@ using (var dbConnection = dbProviderFactory.CreateConnection())
        EMP
     ";
 
-    // ③カーソルオープン
+    // ③問い合わせ実行
     using (var dbDataReader = dbCommand.ExecuteReader())
     {
-      // ④カーソル読み込み
+      // ④DbDataReader読み込み
       while (dbDataReader.Read())
       {
         // ⑤カーソルからデータ取得
@@ -54,7 +54,7 @@ using (var dbConnection = dbProviderFactory.CreateConnection())
         Console.WriteLine($"{empno}\t{ename}\t{sal,6:#,##0}\t{comm,6:#,##0}");
       }
 
-      // ⑥カーソルクローズ
+      // ⑥DbDataReaderを閉じる
       dbDataReader.Close();
     }
   }
@@ -77,5 +77,14 @@ using (var dbConnection = dbProviderFactory.CreateConnection())
 - 1行に1項目
 - ","（カンマ）は前置
     - 最後に項目を追加する際、ひとつ前の行の末尾に","を付け足す必要が無いため
+
+### ③問い合わせ実行
+
+SQL実行準備が整ったところで、SQLを実行します。SELECT文のようなデータ読み取りには、DbCommandクラスのExecuteReaderメソッドを呼び出します。このメソッドの戻り値はDbDataReader型で、取得したDbDataReaderオブジェクトを通してDBの「カーソル」を制御することが出来ます。つまり、カーソルのオープンが行われているのです。
+なお、DbDataReader型もIDisposableインターフェイスを実装しているので、using文を使うことを忘れないで下さい。
+
+
+
+
 
 [→第5章 スカラー値の取得](05-get-scalar-value.md)  
