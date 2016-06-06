@@ -40,6 +40,36 @@ using (var dbCommand = dbConnection.CreateCommand())
 
 ExecuteScalarメソッド実行時も、DB接続を開いてDbCommandオブジェクトを作成する手順は変わりません。ExecuteScalarメソッドの戻り値はobject型ですので、DbDataReaderの列名指定のインデクサーと同様に、キャストもしくは変換が必要です。そして、同じ理由でキャストではなくConvet.To型名メソッドを勧めます。
 
+### ②主キーを指定指定して値を取得
 
+もう一つ、主キーを指定して名称等の値を取得することを考えましょう。通常SELECT文はカーソルを使って複数レコードを処理するのが一般的ですが、主キーを指定することで①レコードに絞り、さらにその中の一項目だけ取り出すなら、それは「単一行、単一項目」取得することになり、ExecuteScalarメソッドを使うことができます（リスト5-2）。
+
+リスト5-2 主キー指定の単一項目取得処理（Program.csのMainメソッドより）
+
+```csharp
+// ②主キーを指定指定して値を取得
+using (var dbCommand = dbConnection.CreateCommand())
+{
+  // 実行SQL文設定
+  dbCommand.CommandText = @"
+    select
+     ENAME
+    from
+     EMP
+    where
+     EMPNO = 7900
+  ";
+
+  // 取得値を変換
+  var employeeName = dbCommand.ExecuteScalar() as string;
+
+  Console.WriteLine($"EMPLOYEE NAME : {employeeName}");
+}
+```
+
+単一項目を取得する際は、値が数値とは限りません。「名称」のような文字列を取得するなら、as演算子を使うことが出来ます。
+
+
+SELECT文の実行とその結果取得方法を、ExecuteReaderメソッド、ExecuteScalarメソッドの2つ見てきました。次の章では登録、更新、削除といった「非問い合わせ」の実行方法を見ていきましょう。
 
 [→第6章 非問い合わせ](06-execute-non-query.md)  
