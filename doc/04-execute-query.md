@@ -83,7 +83,10 @@ using (var dbConnection = dbProviderFactory.CreateConnection())
 SQL実行準備が整ったところで、SQLを実行します。SELECT文のようなデータ読み取りには、DbCommandクラスのExecuteReaderメソッドを呼び出します。このメソッドの戻り値はDbDataReader型で、取得したDbDataReaderオブジェクトを通してDBの「カーソル」を制御することが出来ます。つまり、カーソルのオープンが行われているのです。
 なお、DbDataReader型もIDisposableインターフェイスを実装しているので、using文を使うことを忘れないで下さい。
 
+### ④DbDataReader読み込み
 
+SELECT文を実行したので、次にデータの読み込みを行うため、DbDataReaderクラスのReadメソッドを呼び出します。このメソッドの戻り値はbool型で、実行すると内部のカーソルに対してフェッチを行い、現在位置を進めてデータがあればtrue、なければfalseを返します。この戻り値をwhile文で判定することで、最後のデータまで繰り返し読みこむことが出来ます。
+なお、該当データがなければ初回のReadメソッドの時点で戻り値がfalseとなるため、whileループ内の処理は行われません。
 
 
 
