@@ -123,7 +123,7 @@ using (var dbCommand = dbConnection.CreateCommand())
   // (2) パラメーター作成
   var enameParameter = dbCommand.CreateParameter();
   // (3) パラメーターの型指定
-  enameParameter.DbType = System.Data.DbType.String;
+  enameParameter.DbType = DbType.String;
   // (4) パラメーターの値設定
   enameParameter.Value = ename;
 
