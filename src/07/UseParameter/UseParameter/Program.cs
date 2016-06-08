@@ -3,7 +3,7 @@ using System.Configuration;
 using System.Data;
 using System.Data.Common;
 
-namespace UserParameter
+namespace UseParameter
 {
   class Program
   {
