@@ -73,8 +73,59 @@ using (var dbTransaction = dbConnection.BeginTransaction())
 
 ただ、明示的にロールバックしている方が、プログラムの意図がわかりやすいので、省略しない方をお勧めしておきます。
 
+## ②自動トランザクション
+
+次に、自動でトランザクションを管理してくれる方法です。それにはSystem.Transactions.dllに含まれる、System.Transactions.TransactionScopeクラスを使います（リスト9-2）。コードを書く前にSystem.Transactions.dllへの参照を追加し（図9-1）、using句を使ってSystem.Transactions名前空間をインポートしておきましょう。
+
+```csharp
+using System.Transactions;
+```
+
+![System.Transactionsへの参照追加](../image/09-01.jpg)
+
+図9-1 System.Transactionsへの参照追加
+
+リスト9-2 自動トランザクション（Program.csのMainメソッドより）
+
+```csharp
+// (1) トランザクションスコープ作成
+using (var transactionScope = new TransactionScope())
+{
+  // データを更新する
+  using (var dbCommand = dbConnection.CreateCommand())
+  {
+    dbCommand.CommandText = $@"
+        update EMP
+        set
+         ENAME = 'SMITH'
+        where
+         EMPNO = 7369
+      ";
+
+    var updateCount = dbCommand.ExecuteNonQuery();
+
+    Console.WriteLine($"UPDATE COUNT : {updateCount}");
+  }
+
+  // (2) トランザクション完了
+  transactionScope.Complete();
+}
+```
+
+### (1) トランザクションスコープ作成
+
+TransactionScopeクラスの新しいインスタンスを作成することで、自動トランザクションを開始します。このTransactionScopeインスタンスはIDisposableインターフェイスを実装しており、Disposeメソッドが呼ばれるまでがトランザクションの範囲になります。
+
+実際に使用する際は、using文を使って、トランザクション範囲をコードブロックとして表すのがわかりやすいでしょう。
+
+トランザクションスコープを作成すると、その後実行されるSQLは明示的にトランザクションの設定を行わなくとも、現在開始しているトランザクションの中で実行されます。このことと利用すると、業務ロジック層でデータ プロバイダーのことを意識せずとも、トランザクションの範囲を明示できるという利点があります。
+
+### (2) トランザクション完了
+
+transactionScopeクラスのCompleteメソッドを呼び出すと、トランザクションをコミットして完了します。using文を使っていれば、Completeメソッドを呼び出さずにブロックを終えると、自動でロールバックされるということになります。
+
+非常に便利なTransactionScopeですが、内部的にはトランザクション管理を担当する別のサービスプロセスに処理を移管しているため、その「トランザクション管理サービス」が提供されているDB製品でしか利用できません。SQL ServerやOracle Databaseなど主要な有償DB製品ならまず問題ありませんが、その他のDB製品ではよく調査してから使うようにしてください。
 
 
-
-
+トランザクション管理も行えるようになったので、あと残ったDBアクセス処理はエラー処理だけです。次の章では、そのエラー処理について学びます。
 [→第10章 例外処理](10-handle-exception.md)
