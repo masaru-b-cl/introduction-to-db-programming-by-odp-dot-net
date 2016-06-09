@@ -133,3 +133,36 @@ Query<T>メソッドの戻り値はIEnumerable<T>型になります。サンプ�
 foreach文によって列挙された項目は当然Employee型として扱えるので、各プロパティにアクセスすることで、SQLで取得した各項目の値を取得できます。この時、DbDataReaderを使うときに必要だった型変換やDBNullだった場合自動的にnullにするような処理は、Dapperが代わりに行ってくれているため、アプリケーション側では意識する必要がありません。
 
 
+## ②スカラー値取得
+
+次はスカラー値取得です（リスト11-3）。
+
+リスト11-3 スカラー値取得（Program.csのMainメソッドより）
+
+```csharp
+// (1) SQL実行
+var employeeCount = dbConnection.ExecuteScalar<int>(
+  @"
+    select
+     COUNT(EMPNO)
+    from
+     EMP
+    where
+     ENAME like :ENAME || '%'
+  ",
+  new { ENAME = ename }
+);
+
+// (2) 実行結果表示
+Console.WriteLine($"総社員数 : {employeeCount}");
+```
+
+### (1) SQL実行
+
+スカラー値を取得するには、DbConnectionクラスのExecuteScalar<T>拡張メソッドを呼び出します。型引数Tは取得するスカラー値の型に合わせて指定します。今回は件数を取得するので、int型を指定しています。
+
+### (2) 実行結果表示
+ExecuteScalar<T>拡張メソッドの戻り値はT型になります。サンプルコードではint型になるので、そのまま表示しています。
+
+
+
