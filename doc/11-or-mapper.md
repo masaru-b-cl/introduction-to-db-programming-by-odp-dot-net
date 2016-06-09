@@ -67,4 +67,69 @@ using Dapper;
 
 マッピング型にはSQLに記載する列名、項目名と同じ名前のプロパティを作成します。この時、DB上でNULLになる可能性がある値型の項目は、null許容型として定義するのがポイントです。
 
+これで準備が整ったのでDapperを使ったSQL実行に入っていきましょう。
+
+## ①問い合わせ
+
+まずは問い合わせです（リスト11-2）。
+
+リスト11-2 問い合わせ（Program.csのMainメソッドより）
+
+```csharp
+// ①問い合わせ
+// (1) SQL実行
+var employees = dbConnection.Query<Employee>(
+  @"
+    select
+     EMPNO
+    ,ENAME
+    ,JOB
+    ,MGR
+    ,HIREDATE
+    ,SAL
+    ,COMM
+    ,DEPTNO
+    from
+     EMP
+    where
+     ENAME like :ENAME || '%'
+  ",
+  new { ENAME = ename }
+);
+
+// (2) 取得データを列挙
+foreach (var employee in employees)
+{
+  // (3) 取得データを表示
+  Console.WriteLine(
+    $"{employee.EMPNO}"
+    + $"\t{employee.ENAME}"
+    + $"\t{employee.JOB}"
+    + $"\t{employee.MGR}"
+    + $"\t{employee.HIREDATE:yyyy/MM/dd}"
+    + $"\t{employee.SAL,6:#,##0}"
+    + $"\t{employee.COMM,6:#,##0}"
+    + $"\t{employee.DEPTNO}"
+  );
+}
+```
+
+### (1) SQL実行
+
+DbCommandクラスのQuery<T>拡張メソッドを呼び出して、問い合わせSQLを実行します。この時型引数Tには、SELECT文の実行結果をマッピングする対象の型を指定します。今回はEMP表のデータを取得するので、型引数にはEmployee型を指定します。
+
+Query<T>メソッドの第一引数は、実行するSQL文です。通常の問い合わせと同じようにSELECT文を書けばよいだけです。もちろんパラメーターも使えます。
+
+Query<T>メソッドの第二引数は、パラメーターと同名のプロパティを持つオブジェクトを設定します。パラメーターは問い合わせで取得する型とは項目が違うケースが多く、匿名型を使うのが良いでしょう。もちろん、Employee型のように定義された型のオブジェクトでも問題はありません。
+
+### (2) 取得データ列挙
+
+Query<T>メソッドの戻り値はIEnumerable<T>型になります。サンプルでは型引数にEmployee型を指定したので、戻り値はIEnumerable<Employee>型です。したがって、foreach文によって値の列挙が可能です。
+
+なお、当然LINQを使って絞り込んだり、集計することも出来ます。
+
+### (3) 取得データ表示
+
+foreach文によって列挙された項目は当然Employee型として扱えるので、各プロパティにアクセスすることで、SQLで取得した各項目の値を取得できます。この時、DbDataReaderを使うときに必要だった型変換やDBNullだった場合自動的にnullにするような処理は、Dapperが代わりに行ってくれているため、アプリケーション側では意識する必要がありません。
+
 
