@@ -202,4 +202,30 @@ Console.WriteLine($"更新件数 : {updatedCount}");
 Executeメソッドの戻り値は、DbCommandクラスのExecuteNonQueryと同じく、影響を受けた行数です。サンプルではUPDATE文により更新されたレコード件数を取得して表示しています。
 
 
+## トランザクション
+
+手動トランザクションを考慮したSQL実行は、それぞれのDapperのメソッドの第三引数に、トランザクションオブジェクトを渡してやるだけで良いです（リスト11-5）。
+
+リスト11-5 トランザクション（Program.csのMainメソッドより）
+
+```charp
+dbConnection.Execute(
+  @"
+    update EMP
+    set
+     ENAME = :ENAME
+    where
+     EMPNO = :EMPNO
+  ",
+  new Employee
+  {
+    ENAME = "SMITH",
+    EMPNO = 7369
+  },
+  dbTransaction // トランザクションオブジェクト
+);
+```
+
+当然のことながら、TransactionScopeを使った自動トランザクションなら、こういった配慮は不要です。
+
 
