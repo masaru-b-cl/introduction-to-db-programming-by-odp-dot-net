@@ -44,4 +44,27 @@ using Dapper;
 
 ```
 
+## マッピング型定義
+
+最初に行うのは、「マッピング」するための型です（リスト11-1）。
+
+リスト11-1 マッピング型定義（Program.csより）
+
+```csharp
+  // マッピング型定義 
+  class Employee
+  {
+    public int EMPNO { get; set; }
+    public string ENAME { get; set; }
+    public string JOB { get; set; }
+    public int? MGR { get; set; }
+    public DateTime HIREDATE { get; set; }
+    public decimal SAL { get; set; }
+    public decimal? COMM { get; set; }
+    public int DEPTNO { get; set; }
+  }
+```
+
+マッピング型にはSQLに記載する列名、項目名と同じ名前のプロパティを作成します。この時、DB上でNULLになる可能性がある値型の項目は、null許容型として定義するのがポイントです。
+
 
