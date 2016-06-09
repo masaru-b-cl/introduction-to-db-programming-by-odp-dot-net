@@ -140,6 +140,7 @@ foreach文によって列挙された項目は当然Employee型として扱え�
 リスト11-3 スカラー値取得（Program.csのMainメソッドより）
 
 ```csharp
+// ②スカラー値取得
 // (1) SQL実行
 var employeeCount = dbConnection.ExecuteScalar<int>(
   @"
@@ -159,10 +160,46 @@ Console.WriteLine($"総社員数 : {employeeCount}");
 
 ### (1) SQL実行
 
-スカラー値を取得するには、DbConnectionクラスのExecuteScalar<T>拡張メソッドを呼び出します。型引数Tは取得するスカラー値の型に合わせて指定します。今回は件数を取得するので、int型を指定しています。
+スカラー値を取得するには、DbConnectionクラスのExecuteScalar<T>拡張メソッドを呼び出します。型引数Tは取得するスカラー値の型に合わせて指定します。今回は件数を取得するので、int型を指定しています。後の引数はQuery<T>メソッドと同じです。
 
 ### (2) 実行結果表示
 ExecuteScalar<T>拡張メソッドの戻り値はT型になります。サンプルコードではint型になるので、そのまま表示しています。
+
+## ③非問い合わせ
+
+最後は非問い合わせです（リスト11-4）。
+
+リスト11-4 非問い合わせ（Program.csのMainメソッドより）
+
+```csharp
+// ③非問い合わせ
+// (1) SQL実行
+var updatedCount = dbConnection.Execute(
+  @"
+    update EMP
+    set
+     ENAME = :ENAME
+    where
+     EMPNO = :EMPNO
+  ",
+  new Employee
+  {
+    ENAME = "SMITH",
+    EMPNO = 7369
+  }
+);
+
+// (2) 更新件数表示
+Console.WriteLine($"更新件数 : {updatedCount}");
+```
+
+### (1) SQL実行
+
+非問い合わせSQLを実行するには、Execute拡張メソッドを呼び出します。引数はQuery<T>メソッドと同じです。サンプルのように、パラメータには実際に定義されている型のオブジェクトを使うことが出来ます。
+
+### (2) 更新件数表示
+
+Executeメソッドの戻り値は、DbCommandクラスのExecuteNonQueryと同じく、影響を受けた行数です。サンプルではUPDATE文により更新されたレコード件数を取得して表示しています。
 
 
 
