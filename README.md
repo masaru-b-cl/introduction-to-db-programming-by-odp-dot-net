@@ -57,4 +57,8 @@ DBプログラミング入門 by ODP.NET
 
 ## 参考資料
 
-- (順次追加予定)
+- [.NET Framework データ プロバイダー](https://msdn.microsoft.com/ja-jp/library/a6cd7c08.aspx)
+- [OTN Japan - 初心者向け講座 : はじめてのODP.NETアプリケーション開発](http://otn.oracle.co.jp/beginner/odpnet/)
+- [Insider.NET > ADO.NET基礎講座 - ＠IT](http://www.atmarkit.co.jp/ait/subtop/features/dotnet/adonet_index.html)
+- [.NETの例外処理 Part.2 | とあるコンサルタントのつぶやき](https://blogs.msdn.microsoft.com/nakama/2009/01/02/net-part-2/)
+- [ADO.NETとORMとMicro-ORM －dapper dot netを使ってみた](http://www.slideshare.net/kiyokura/adonetormmicro-orm-dapper-dot-net)
