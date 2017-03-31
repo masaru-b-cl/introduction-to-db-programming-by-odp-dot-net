@@ -62,3 +62,9 @@ DBプログラミング入門 by ODP.NET
 - [Insider.NET > ADO.NET基礎講座 - ＠IT](http://www.atmarkit.co.jp/ait/subtop/features/dotnet/adonet_index.html)
 - [.NETの例外処理 Part.2 | とあるコンサルタントのつぶやき](https://blogs.msdn.microsoft.com/nakama/2009/01/02/net-part-2/)
 - [ADO.NETとORMとMicro-ORM －dapper dot netを使ってみた](http://www.slideshare.net/kiyokura/adonetormmicro-orm-dapper-dot-net)
+
+## ライセンス
+
+![クリエイティブ・コモンズ・ライセンス](https://i.creativecommons.org/l/by-sa/4.0/88x31.png)
+
+この 作品 は [クリエイティブ・コモンズ 表示 - 継承 4.0 国際 ライセンス](http://creativecommons.org/licenses/by-sa/4.0/") の下に提供されています。
