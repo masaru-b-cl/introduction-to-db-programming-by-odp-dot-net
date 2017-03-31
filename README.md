@@ -23,8 +23,8 @@ DBプログラミング入門 by ODP.NET
 ### 本文書の開発環境
 
 - Windows 10 Pro 64bit
-- Visual Studio 2015 Community
-- Oracle Database 11g Release 2
+- Visual Studio 2017 Community
+- Oracle Database 12c Release 1
 
 ## 目次
 
