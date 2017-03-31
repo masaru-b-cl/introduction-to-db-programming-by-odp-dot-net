@@ -19,7 +19,7 @@ Oracl Database向けのデータプロバイダーは、実は.NET Frameworkに�
 
 ## ODP.NETのインストール
 
-まずDBに接続して開くだけのサンプルアプリケーションを、コンソールアプリケーションとして作成します（図3-1）。
+まずDBに接続して開くだけのサンプルアプリケーションプロジェクトを「Console App (.NET Framework)」として作成します（図3-1）。このとき「コンソール アプリ (.NET Core)」を間違って選択しないよう注意してください。
 
 ![プロジェクト作成](../image/03-01.jpg)
 
@@ -150,6 +150,14 @@ ODP.NETのインストールが終わったので、今度は実際に接続す�
 ![ライブラリ参照状況](../image/03-09.jpg)
 
 図3-9 ライブラリ参照状況
+
+他の使わない以下のライブラリ参照は消して島ってかまいません。
+
+- Microsoft.CSharp
+- System.Data.DataSetExtensions
+- System.Net.Http
+- System.Xml
+- System.Xml.Linq
 
 これでようやくOracle Databaseにアクセスするコードを書く準備ができました。
 
