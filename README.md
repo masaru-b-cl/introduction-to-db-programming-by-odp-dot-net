@@ -53,7 +53,26 @@ DBプログラミング入門 by ODP.NET
 
 ## サンプルについて
 
-各章のサンプルコードは、`src`フォルダーの下にある章番号フォルダーの中にあります。リポジトリ全体をzipファイル等でダウンロードして展開後、Visual Studioでソリューションを開いて内容を確認してください。
+各章のサンプルコードは、`src`フォルダーの下にある章番号フォルダーの中にあります。リポジトリをクローンするか、zipファイル等でダウンロードして展開後、Visual Studioでソリューションを開いて内容を確認してください。
+
+実行子する際は、各プロジェクト内の`App.config`ファイルの以下の部分の`HOST`、`PORT`、`SERVICE_NAME`等を、各自の環境に合わせて変更してください。
+
+```xml
+  <!-- (4) -->
+  <oracle.manageddataaccess.client>
+    <version number="*">
+      <dataSources>
+        <!-- (5) -->
+        <dataSource alias="ORCL"
+          descriptor="(DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=hostname)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=ORCL))) "/>
+      </dataSources>
+    </version>
+  </oracle.manageddataaccess.client>
+```
+
+また、本サンプルはOracle Databaseのサンプル・スキーマ「SCOTT」を前提にしています。Oracle Database 12c Release 1であれば、インストール時に「システム・クラス」で「サーバー・クラス」を選び、その後「構成オプションの指定」でサンプルスキーマを作成するよう指定してください。
+
+![サンプル・スキーマのインストール](image/00-01.jpg)
 
 ## 参考資料
 
