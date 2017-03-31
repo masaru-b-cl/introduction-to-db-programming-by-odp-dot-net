@@ -3,17 +3,15 @@
 
 [↑目次](..\README.md "目次")
 
-[←第2章 データ プロバイダー](02-data-provider.md)
+[←第2章 データプロバイダー](02-data-provider.md)
 
-データ プロバイダーの構成やDBアクセスの手順の大枠がわかったところで、今度は具体的な内容に入っていきましょう。まずはDBに接続する方法からです。なお、本文書ではローカルPCにOracle Databaseがインストールされている前提で以後の説明を進めます。
+データプロバイダーの構成やDBアクセスの手順の大枠がわかったところで、今度は具体的な内容に入っていきましょう。まずはDBに接続する方法からです。なお、本文書ではローカルPCにOracle Databaseがインストールされている前提で以後の説明を進めます。
 
 ## ODP.NET
 
 Oracl Database向けのデータプロバイダーは、実は.NET FrameworkにもSystem.Data.OracleClient名前空間として含まれています。ただし、現在は非推奨になっていること、7i、8i、9iなど過去のバージョン向けであることから、使わないようにしてください。
 
-その代わり、Oracle社から提供されている「ODP.NET」を用います。ODP.NETはOracle向けODBCドライバー等の各種データアクセス用コンポーネント群をまとめた「[Oracle Data Access Components（ODAC）](64ビットのOracle Data Access Components（ODAC）のダウンロード http://www.oracle.com/technetwork/jp/database/windows/downloads/index-214820-ja.html)」に含まれる、Oracle専用データプロバイダーです。
-
-ODP.NETを使用するには、上記ODACをマシンにインストールする方法に加え、NuGet（※）によるインストールにも対応しています。今回は後者の方法でインストールします。
+その代わり、Oracle社から提供されている「ODP.NET」を用います。ODP.NETはOracle Database専用データプロバイダーで、、Oracle Databes向けODBCドライバー等の各種データアクセス用コンポーネント群をまとめた「[Oracle Data Access Components（ODAC）](http://www.oracle.com/technetwork/jp/database/windows/downloads/index-214820-ja.html)」にも含まれています。ODP.NETを使用するには、ODACをマシンにインストールするか、後述するNuGet（※）によるパッケージインストールを粉います。
 
 ※NuGet
 .NETアプリケーション開発のためのライブラリ配布、管理を行う「パッケージ マネージャー」である。多くのライブラリ等が「[NuGet Gallery](https://www.nuget.org/)」で公開されている。
@@ -21,7 +19,7 @@ ODP.NETを使用するには、上記ODACをマシンにインストールする
 
 ## ODP.NETのインストール
 
-まずdb接続を行うサンプルアプリケーションを、コンソールアプリケーションとして作成します（図3-1）。
+まずDBに接続して開くだけのサンプルアプリケーションを、コンソールアプリケーションとして作成します（図3-1）。
 
 ![プロジェクト作成](../image/03-01.jpg)
 
@@ -63,7 +61,11 @@ ODP.NETのインストールが行われます。インストールした結果�
 
 図3-7 パッケージインストール結果
 
-なお、ODACをインストールした場合は、プロジェクトのプロパティより「アセンブリ」→「拡張」欄に表示される「Oracle.ManagedDataAccess」への参照を追加すればよいです。
+なお、ODACをインストールした場合は、直接ODACインストール先のdllファイルへの参照をプロジェクトに追加します。その手順は、プロジェクトを右クリックして［追加］→［参照］を選択して「参照マネージャー」画面を開いた後、［参照］ボタンをクリックしてODACインストール先フォルダー内の「\client_1\odp.net\managed\common\Oracle.ManagedDataAccess.dll」ファイルを選択し、［追加］ボタンをクリックすればよいです。
+
+![Oracle.ManagedDataAccess.dllの直接参照](../image/03-08.jpg)
+
+図3-8 Oracle.ManagedDataAccess.dllの直接参照
 
 ## DBアクセス準備
 
@@ -123,11 +125,11 @@ ODP.NETのインストールが終わったので、今度は実際に接続す�
 
 ### (5) データソース設定
 
-(4)に含まれるoracle.manageddataaccess > version > dataSources > dataSource要素が接続先のOracleサーバー情報を記載する箇所です。alias属性には(6)で使用するデータソース名を指定し、descripter要素に実際の接続情報を指定します。記載内容はtnsnames.oraファイルに書くものと全く同じです。なお、HOST項目は既定では"localhost"が設定されていますが、ローカルにOracle Databaseがインストールされているときは自らのマシン名を指定するようにしてください。．
+(4)に含まれるoracle.manageddataaccess > version > dataSources > dataSource要素が接続先のOracleサーバー情報を記載する箇所です。alias属性には(6)で使用するデータソース名を指定し、descripter要素に実際の接続情報を指定します。記載内容はtnsnames.oraファイルに書くものと全く同じです。なお、HOST項目は既定では"localhost"が設定されています。接続先のOracle Databaseサーバーがローカルにインストールされているものではないときは、対象となるホストマシン名を指定するようにしてください。
 
 ### (6) 接続文字列設定
 
-次にプログラム無いから(5)で指定したデータソースに接続するための「データベース接続文字列（以下、DB接続文字列）」情報を追加します。name属性にはプログラム内からこの接続文字列を取得する際に使用する名前、providerName属性には(2)のsystem.data > DbProviderFactories > add要素のinvariant属性で指定した名前を設定します。そして最も大事なconnectionString属性には、接続に使用するデータソース名、ユーザー、パスワードをそれぞれ指定します。今回はOracleのサンプルスキーマであるSCOTTに接続します。
+次にプログラム無いから(5)で指定したデータソースに接続するための「データベース接続文字列（以下、DB接続文字列）」情報を追加します。name属性にはプログラム内からこの接続文字列を取得する際に使用する名前、providerName属性には(2)のsystem.data > DbProviderFactories > add要素のinvariant属性で指定した名前を設定します。そして最も大事なconnectionString属性には、接続に使用するデータソース名（Data Source、(5)のalias属性に指定した値）、ユーザー、パスワードをそれぞれ指定します。今回はOracle Databaseに付属するサンプルスキーマ「SCOTT」に接続します。
 
 なお、接続文字列にはもっと詳細な設定も可能です。てより詳しい内容は、次のURLを参照してください。
 
@@ -140,14 +142,14 @@ ODP.NETのインストールが終わったので、今度は実際に接続す�
 
 | ライブラリ名         | 説明                                                     |
 |----------------------|----------------------------------------------------------|
-| System.Data          | データ プロバイダー本体                                  |
+| System.Data          | データプロバイダー本体                                  |
 | System.Configuration | 接続文字列情報をアプリケーション構成ファイルから読み込む |
 
 表3-1 DBアクセスに必要なライブラリ
 
-![ライブラリ参照状況](../image/03-08.jpg)
+![ライブラリ参照状況](../image/03-09.jpg)
 
-図3-8 ライブラリ参照状況
+図3-9 ライブラリ参照状況
 
 これでようやくOracle Databaseにアクセスするコードを書く準備ができました。
 
@@ -206,7 +208,7 @@ namespace SimpleQueryApplication
 
 ### (3) DbProviderFactoryインスタンスの生成、取得
 
-続いてDbProviderFactoriesクラスのGetFactory静的メソッドを使い、ODP.NETのDbProviderFactory派生クラスのインスタンスを生成、取得します。引数にはデータ プロバイダー名を指定します。今回はDB接続文字列情報のProviderNameプロパティを使用しています。これは、プログラム弧度内に直接データ プロバイダー名を書かずに済ませるためです。
+続いてDbProviderFactoriesクラスのGetFactory静的メソッドを使い、ODP.NETのDbProviderFactory派生クラスのインスタンスを生成、取得します。引数にはデータプロバイダー名を指定します。今回はDB接続文字列情報のProviderNameプロパティを使用しています。これは、プログラムコード内に直接データプロバイダー名を書かずに済ませるためです。
 
 ### (4) DB接続オブジェクト作成
 
