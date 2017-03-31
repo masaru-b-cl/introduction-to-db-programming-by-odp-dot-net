@@ -75,15 +75,19 @@ using (var dbTransaction = dbConnection.BeginTransaction())
 
 ## ②自動トランザクション
 
-次に、自動でトランザクションを管理してくれる方法です。それにはSystem.Transactions.dllに含まれる、System.Transactions.TransactionScopeクラスを使います（リスト9-2）。コードを書く前にSystem.Transactions.dllへの参照を追加し（図9-1）、using句を使ってSystem.Transactions名前空間をインポートしておきましょう。
+次に、自動でトランザクションを管理してくれる方法です。それにはSystem.Transactions.dllに含まれる、System.Transactions.TransactionScopeクラスを使います。コードを書く前にSystem.Transactions.dllへの参照を追加し（図9-1）、using句を使ってSystem.Transactions名前空間をインポートしておきましょう。
+
+![System.Transactionsへの参照追加](../image/09-01.jpg)
+
+図9-1 System.Transactionsへの参照追加
 
 ```csharp
 using System.Transactions;
 ```
 
-![System.Transactionsへの参照追加](../image/09-01.jpg)
+また、TransactionScopeを使った自動トランザクションを行うには、ODACに含まれる「Oracle Services for Microsoft Transaction Server」が必要です。Oracle DatabaseがローカルPCにインストールされていれば既にインストールされている可能性が高いですが、そうでない場合はODACを先にインストールしてください。
 
-図9-1 System.Transactionsへの参照追加
+TransactionScopeを使ったトランザクション制御は次のコードで行います（リスト9-2）。
 
 リスト9-2 自動トランザクション（Program.csのMainメソッドより）
 
