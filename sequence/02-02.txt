@@ -15,11 +15,11 @@ DbConnection->+DbTransaction: 生成
 Application->DbConnection: ⑤DbCommand作成
 DbConnection->+DbCommand: 生成
 
-Application->DbCommand: トランザクション設定
+Application->DbCommand: ⑥トランザクション設定
 
 note left of Application
-    ⑥SQL実行
-    ⑦結果取得
+    ⑦SQL実行
+    ⑧結果取得
 end note
 
 alt 問い合わせ
@@ -45,10 +45,10 @@ end
 Application->DbCommand: 破棄
 destroy DbCommand
 
-Application->DbTransaction: ⑧コミット/ロールバック
+Application->DbTransaction: ⑨コミット/ロールバック
 destroy DbTransaction
 
-Application->DbConnection: ⑨閉じる
+Application->DbConnection: ⑩閉じる
 destroy DbConnection
 
 Application->DbProviderFactory: 破棄
